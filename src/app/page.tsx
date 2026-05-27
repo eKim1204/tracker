@@ -117,10 +117,13 @@ export default function Home() {
 
   const refreshFriend = useCallback(async (friend: Friend) => {
     setLoadingMap((m) => ({ ...m, [friend.id]: true }));
-    const stats = await loadFriendStats(friend);
-    setStatsMap((m) => ({ ...m, [friend.id]: stats }));
-    setLoadingMap((m) => ({ ...m, [friend.id]: false }));
-    setLastUpdated(new Date());
+    try {
+      const stats = await loadFriendStats(friend);
+      setStatsMap((m) => ({ ...m, [friend.id]: stats }));
+      setLastUpdated(new Date());
+    } finally {
+      setLoadingMap((m) => ({ ...m, [friend.id]: false }));
+    }
   }, []);
 
   const refreshAll = useCallback(async () => {
