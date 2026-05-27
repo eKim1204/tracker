@@ -16,30 +16,30 @@ export async function GET(req: NextRequest) {
   if (statusCode !== 200) return NextResponse.json({ error: `Riot API error: ${statusCode}` }, { status: 502 });
   if ((matchIds as string[]).length === 0) return NextResponse.json([]);
 
-  const summaries: LoLMatchSummary[] = [];
-  for (const id of matchIds as string[]) {
-    const { statusCode: s, data: match } = await riotFetch(
-      `https://asia.api.riotgames.com/lol/match/v5/matches/${id}`,
-      RIOT_API_KEY
-    );
-    if (s !== 200) continue;
-
-    const m = match as any;
-    const participant = m.info.participants.find((p: { puuid: string }) => p.puuid === puuid);
-    if (!participant) continue;
-
-    summaries.push({
-      matchId: m.metadata.matchId,
-      championName: participant.championName,
-      kills: participant.kills,
-      deaths: participant.deaths,
-      assists: participant.assists,
-      win: participant.win,
-      gameDuration: m.info.gameDuration,
-      gameCreation: m.info.gameCreation,
-      queueId: m.info.queueId,
-    });
-  }
+  const results = await Promise.all(
+    (matchIds as string[]).map(async (id) => {
+      const { statusCode: s, data: match } = await riotFetch(
+        `https://asia.api.riotgames.com/lol/match/v5/matches/${id}`,
+        RIOT_API_KEY
+      );
+      if (s !== 200) return null;
+      const m = match as any;
+      const participant = m.info.participants.find((p: { puuid: string }) => p.puuid === puuid);
+      if (!participant) return null;
+      return {
+        matchId: m.metadata.matchId,
+        championName: participant.championName,
+        kills: participant.kills,
+        deaths: participant.deaths,
+        assists: participant.assists,
+        win: participant.win,
+        gameDuration: m.info.gameDuration,
+        gameCreation: m.info.gameCreation,
+        queueId: m.info.queueId,
+      } as LoLMatchSummary;
+    })
+  );
+  const summaries = results.filter((r): r is LoLMatchSummary => r !== null);
 
   return NextResponse.json(summaries);
 }

@@ -124,9 +124,7 @@ export default function Home() {
   }, []);
 
   const refreshAll = useCallback(async () => {
-    for (const friend of FRIENDS) {
-      await refreshFriend(friend);
-    }
+    await Promise.all(FRIENDS.map((friend) => refreshFriend(friend)));
   }, [refreshFriend]);
 
   useEffect(() => {
