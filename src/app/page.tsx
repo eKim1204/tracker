@@ -198,7 +198,7 @@ export default function Home() {
 
       {/* Main */}
       <main className="max-w-6xl mx-auto px-4 py-8">
-        <div className="flex gap-5 items-start">
+        <div className="flex flex-col md:flex-row gap-5 items-start">
           {/* 친구 카드 목록 */}
           <div className="flex-1 min-w-0 grid gap-4">
             {FRIENDS.map((friend) => {
@@ -221,7 +221,7 @@ export default function Home() {
           </div>
 
           {/* 랭크 순위 사이드바 */}
-          <div className="w-72 shrink-0 sticky top-20 flex flex-col gap-4">
+          <div className="w-full md:w-72 md:shrink-0 md:sticky md:top-20">
             <SoloRankLeaderboard statsMap={statsMap} loadingMap={loadingMap} />
           </div>
         </div>
